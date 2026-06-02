@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema de Historias de Usuario</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #f4f4f4;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    #pagina-inicio {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 30px;
+    }
+
+    #pagina-inicio h1 {
+      font-size: 2rem;
+      text-align: center;
+      border-bottom: 3px solid #222;
+      padding-bottom: 10px;
+    }
+
+    .btn-entrar {
+      padding: 16px 48px;
+      font-size: 1rem;
+      font-family: 'Courier New', monospace;
+      border: 2px solid #222;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-entrar:hover { background: #222; color: white; }
+
+    .pagina {
+      display: none;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .pagina.visible { display: block; }
+
+    .btn-volver {
+      background: none;
+      border: none;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-bottom: 30px;
+      text-decoration: underline;
+      color: #555;
+    }
+
+    .btn-volver:hover { color: #222; }
+
+    h2 { font-size: 1.4rem; margin-bottom: 6px; }
+
+    .subtitulo { font-size: 0.85rem; color: #777; margin-bottom: 30px; }
+
+    .grupo { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      border: 2px solid #ccc;
+      background: white;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: #222; }
+
+    textarea { resize: vertical; min-height: 90px; }
+
+    .campo-readonly {
+      width: 100%;
+      padding: 10px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      border: 2px solid #ccc;
+      background: #f9f9f9;
+      color: #555;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      background: #222;
+      color: white;
+      border: 2px solid #222;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-submit:hover { background: white; color: #222; }
+
+    #mensaje {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 16px;
+      border: 2px solid;
+      font-size: 0.9rem;
+    }
+
+    #mensaje.exito { border-color: #2a7a2a; background: #f0fff0; color: #2a7a2a; }
+    #mensaje.error { border-color: #a00; background: #fff0f0; color: #a00; }
+
+    #historial {
+      margin-top: 30px;
+      border-top: 2px solid #ddd;
+      padding-top: 20px;
+    }
+
+    #historial h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      color: #555;
+    }
+
+    .item-historia {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      background: white;
+    }
+
+    .item-historia span { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- INICIO -->
+  <div id="pagina-inicio">
+    <h1>Estimar Puntos de Historia</h1>
+    <p style="color:#777; font-size:0.9rem;">Historia de Usuario — Marvin</p>
+    <button class="btn-entrar" onclick="mostrarPagina('pagina-marvin')">Entrar</button>
+  </div>
+
+  <!-- PAGINA MARVIN -->
+  <div id="pagina-marvin" class="pagina">
+    <button class="btn-volver" onclick="mostrarPagina('pagina-inicio')">← Volver</button>
+    <h2>Estimar Puntos de Historia</h2>
+    <p class="subtitulo">Solo los desarrolladores pueden asignar puntos de esfuerzo.</p>
+
+    <div class="grupo">
+      <label>Nombre del desarrollador</label>
+      <select id="input-desarrollador" onchange="seleccionarDesarrollador()"></select>
+    </div>
+
+    <div class="grupo">
+      <label>Rol</label>
+      <div class="campo-readonly" id="display-rol">—</div>
+    </div>
+
+    <div class="grupo">
+      <label>Título de la historia</label>
+      <select id="input-historia" onchange="seleccionarHistoria()"></select>
+    </div>
+
+    <div class="grupo">
+      <label>Puntos de esfuerzo</label>
+      <input type="number" id="input-puntos" placeholder="Ej: 5" min="1" max="100" />
+    </div>
+
+    <div class="grupo">
+      <label>Nota técnica</label>
+      <textarea id="input-nota" placeholder="Explica por qué tiene esa complejidad..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="guardarHistoria()">Guardar estimación</button>
+    <div id="mensaje"></div>
+
+    <div id="historial">
+      <h3>Estimaciones guardadas</h3>
+      <div id="lista-historias">
+        <p style="color:#999; font-size:0.85rem;">Aún no hay estimaciones.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class Desarrollador {
+      constructor(nombre, rol) { this.nombre = nombre; this.rol = rol; }
+      esDesarrollador() { return this.rol === "desarrollador"; }
+    }
+
+    class HistoriaDeUsuario {
+      constructor(titulo) { this.titulo = titulo; this.puntosEsfuerzo = null; this.notaTecnica = null; }
+      modificarPuntos(dev, puntos) { if (dev.esDesarrollador()) this.puntosEsfuerzo = puntos; }
+    }
+
+    let desarrolladores = [];
+    let historiasDB = [];
+    let devSeleccionado = null;
+    let historiaSeleccionada = null;
+    let estimaciones = [];
+
+    function mostrarPagina(id) {
+      document.getElementById("pagina-inicio").style.display = "none";
+      document.querySelectorAll(".pagina").forEach(p => p.classList.remove("visible"));
+      if (id === "pagina-inicio") {
+        document.getElementById("pagina-inicio").style.display = "flex";
+      } else {
+        document.getElementById(id).classList.add("visible");
+        if (id === "pagina-marvin") cargarDatos();
+      }
+    }
+
+    async function cargarDatos() {
+      try {
+        const resDevs = await fetch('http://localhost:3000/api/desarrolladores');
+        desarrolladores = await resDevs.json();
+        const selectDev = document.getElementById("input-desarrollador");
+        selectDev.innerHTML = '';
+        desarrolladores.forEach(d => {
+          selectDev.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
+        });
+        seleccionarDesarrollador();
+
+        const resHistorias = await fetch('http://localhost:3000/api/historias');
+        historiasDB = await resHistorias.json();
+        const selectHist = document.getElementById("input-historia");
+        selectHist.innerHTML = '';
+        historiasDB.forEach(h => {
+          selectHist.innerHTML += `<option value="${h.id}">${h.titulo}</option>`;
+        });
+        seleccionarHistoria();
+      } catch (err) {
+        mostrarMensaje("error", "No se pudo conectar al servidor. ¿Está corriendo node server.js?");
+      }
+    }
+
+    function seleccionarDesarrollador() {
+      const id = parseInt(document.getElementById("input-desarrollador").value);
+      devSeleccionado = desarrolladores.find(d => d.id === id) || null;
+      document.getElementById("display-rol").textContent = devSeleccionado ? devSeleccionado.rol : "—";
+    }
+
+    function seleccionarHistoria() {
+      const id = parseInt(document.getElementById("input-historia").value);
+      historiaSeleccionada = historiasDB.find(h => h.id === id) || null;
+    }
+
+    async function guardarHistoria() {
+      const puntos = parseInt(document.getElementById("input-puntos").value);
+      const nota   = document.getElementById("input-nota").value.trim();
+
+      if (!devSeleccionado) { mostrarMensaje("error", "Selecciona un desarrollador."); return; }
+      if (!historiaSeleccionada) { mostrarMensaje("error", "Selecciona una historia."); return; }
+      if (!puntos || puntos < 1) { mostrarMensaje("error", "Ingresa un valor válido de puntos."); return; }
+
+      const dev = new Desarrollador(devSeleccionado.nombre, devSeleccionado.rol);
+      const historia = new HistoriaDeUsuario(historiaSeleccionada.titulo);
+      historia.modificarPuntos(dev, puntos);
+      historia.notaTecnica = nota || null;
+
+      if (historia.puntosEsfuerzo === null) {
+        mostrarMensaje("error", `"${devSeleccionado.nombre}" tiene rol "${devSeleccionado.rol}" y no puede modificar puntos.`);
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/historias/${historiaSeleccionada.id}/estimar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            puntos_esfuerzo: historia.puntosEsfuerzo,
+            nota_tecnica: historia.notaTecnica,
+            desarrollador_id: devSeleccionado.id
+          })
+        });
+        if (!res.ok) throw new Error("Error al guardar");
+
+        estimaciones.push({ titulo: historiaSeleccionada.titulo, puntos: historia.puntosEsfuerzo, nota, dev: devSeleccionado.nombre });
+        mostrarMensaje("exito", `✓ Historia "${historiaSeleccionada.titulo}" guardada con ${historia.puntosEsfuerzo} puntos.`);
+        actualizarLista();
+        limpiarFormulario();
+      } catch (err) {
+        mostrarMensaje("error", "Error al guardar en la base de datos.");
+      }
+    }
+
+    function mostrarMensaje(tipo, texto) {
+      const el = document.getElementById("mensaje");
+      el.className = tipo;
+      el.textContent = texto;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 4000);
+    }
+
+    function actualizarLista() {
+      const lista = document.getElementById("lista-historias");
+      if (estimaciones.length === 0) {
+        lista.innerHTML = '<p style="color:#999; font-size:0.85rem;">Aún no hay estimaciones.</p>';
+        return;
+      }
+      lista.innerHTML = estimaciones.map(h => `
+        <div class="item-historia">
+          <span>${h.titulo}</span> — ${h.puntos} pts
+          ${h.nota ? `<br/><small>${h.nota}</small>` : ""}
+          <br/><small style="color:#999;">por ${h.dev}</small>
+        </div>
+      `).join("");
+    }
+
+    function limpiarFormulario() {
+      document.getElementById("input-puntos").value = "";
+      document.getElementById("input-nota").value = "";
+    }
+  </script>
+</body>
+</html>
