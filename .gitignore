@@ -3,14 +3,6 @@ node_modules/
 
 # Variables de entorno
 .env
-**/.env
-
-# Cobertura de tests
-coverage/
-
-# Builds
-dist/
-build/
 
 # Logs
 *.log
@@ -18,3 +10,9 @@ build/
 # Archivos del sistema
 .DS_Store
 Thumbs.db
+
+# VS Code
+.vscode/
+
+# Coverage de tests
+coverage/
